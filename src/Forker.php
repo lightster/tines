@@ -2,6 +2,8 @@
 
 namespace Lstr\Tines;
 
+use Exception;
+
 class Forker
 {
     public function fork(callable $fork_callback, $fork_count, $data)
