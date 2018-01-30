@@ -1,0 +1,8 @@
+version: '3.3'
+services:
+  php:
+    build:
+      context: .
+    volumes:
+      - .:/tines
+    working_dir: /tines
