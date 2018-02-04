@@ -5,4 +5,5 @@ services:
       context: .
     volumes:
       - .:/tines
+      - ~/.composer/:/root/.composer
     working_dir: /tines
