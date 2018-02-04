@@ -1,7 +1,5 @@
 FROM php:5.6-cli-alpine
 
-RUN docker-php-ext-install pcntl
-
 # git is for composer
 # bcmath is for phpunit
 # pcntl is for pcntl_* functions
