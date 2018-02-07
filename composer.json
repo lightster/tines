@@ -15,5 +15,8 @@
             "name": "Matt Light",
             "email": "matt.light@lightdatasys.com"
         }
-    ]
+    ],
+    "scripts": {
+        "test": "phpunit"
+    }
 }
