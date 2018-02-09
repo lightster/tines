@@ -14,15 +14,15 @@ class Forker
     }
 
 
-    public function fork(array $callbacks)
+    public function fork(array $fork_callbacks)
     {
         $pids = [];
 
-        foreach ($callbacks as $callback_name => $callback) {
+        foreach ($fork_callbacks as $fork_name => $fork_callback) {
             $pid = pcntl_fork();
 
             if (-1 == $pid) {
-                throw new Exception("Could not create fork #{$callback_name}.");
+                throw new Exception("Could not create fork #{$fork_name}.");
             }
 
             if (!$pid) {
@@ -31,11 +31,11 @@ class Forker
                     call_user_func($child_init);
                 }
 
-                $exit_status = (int)call_user_func($callback, $callback_name);
+                $exit_status = (int)call_user_func($fork_callback, $fork_name);
                 exit($exit_status);
             }
 
-            $pids[$pid] = $callback_name;
+            $pids[$pid] = $fork_name;
         }
 
         $exit_statuses = [];
