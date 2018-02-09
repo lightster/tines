@@ -6,7 +6,7 @@ use PHPUnit_Framework_TestCase;
 
 class ForkerTest extends PHPUnit_Framework_TestCase
 {
-    public function testTrue()
+    public function testFork()
     {
         $forker = new Forker();
 
