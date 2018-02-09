@@ -31,4 +31,34 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             $exit_statuses
         );
     }
+
+    public function testChildInit()
+    {
+        $forker = new Forker([
+            'child.init' => function() {
+                exit(4);
+            }
+        ]);
+
+        $exit_statuses = $forker->fork([
+            'zero' => function() {
+                return 0;
+            },
+            'two' => function() {
+                return 2;
+            },
+            'three' => function() {
+                return 3;
+            },
+        ]);
+
+        $this->assertEquals(
+            [
+                'zero'  => 4,
+                'two'   => 4,
+                'three' => 4,
+            ],
+            $exit_statuses
+        );
+    }
 }

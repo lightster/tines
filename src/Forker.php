@@ -6,6 +6,14 @@ use Exception;
 
 class Forker
 {
+    public function __construct(array $options = [])
+    {
+        $this->options = $options + [
+            'child.init' => function () {},
+        ];
+    }
+
+
     public function fork(array $callbacks)
     {
         $pids = [];
@@ -18,6 +26,11 @@ class Forker
             }
 
             if (!$pid) {
+                $child_init = $this->options['child.init'];
+                if (is_callable($child_init)) {
+                    call_user_func($child_init);
+                }
+
                 $exit_status = (int)call_user_func($callback, $callback_name);
                 exit($exit_status);
             }
