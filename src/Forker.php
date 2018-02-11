@@ -9,7 +9,7 @@ class Forker
     public function __construct(array $options = [])
     {
         $this->options = $options + [
-            'child.init' => function () {},
+            'child.init' => null,
         ];
     }
 
