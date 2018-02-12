@@ -14,7 +14,11 @@ class Forker
         ];
     }
 
-
+    /**
+     * @param array $fork_callbacks
+     * @return array
+     * @throws Exception
+     */
     public function fork(array $fork_callbacks)
     {
         $pids = [];
@@ -55,10 +59,14 @@ class Forker
         return $exit_statuses;
     }
 
+    /**
+     * @param callable|null $callback
+     * @return mixed
+     */
     private function callCallback(callable $callback = null)
     {
         if (!$callback) {
-            return;
+            return null;
         }
 
         $args = func_get_args();
