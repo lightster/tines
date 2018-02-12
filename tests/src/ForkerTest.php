@@ -61,4 +61,36 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             $exit_statuses
         );
     }
+
+    public function testProcessTitlesCan()
+    {
+        $forker = new Forker([
+            'child.process-title' => function ($process_name, $fork_name) {
+                return "{$process_name} ({$fork_name})";
+            },
+        ]);
+
+        $process_title_check = function ($fork_name) {
+            if (strpos(cli_get_process_title(), 'phpunit') === false) {
+                return 1;
+            } elseif (strpos(cli_get_process_title(), 'phpunit') === false) {
+                return 2;
+            }
+
+            return 0;
+        };
+
+        $this->assertEquals(
+            [
+                'zero'  => 0,
+                'two'   => 0,
+                'three' => 0,
+            ],
+            $forker->fork([
+                'zero'  => $process_title_check,
+                'two'   => $process_title_check,
+                'three' => $process_title_check,
+            ])
+        );
+    }
 }
