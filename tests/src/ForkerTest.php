@@ -62,7 +62,7 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessTitlesCan()
+    public function testProcessTitlesCanBeSet()
     {
         $forker = new Forker([
             'child.process-title' => function ($process_name, $fork_name) {
