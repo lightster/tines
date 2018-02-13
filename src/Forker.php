@@ -51,7 +51,9 @@ class Forker
                 throw new Exception("Could not get the status of remaining forks.");
             }
 
-            $exit_statuses[$pids[$pid]] = pcntl_wexitstatus($fork_status);
+            if (pcntl_wifexited($fork_status)) {
+                $exit_statuses[$pids[$pid]] = pcntl_wexitstatus($fork_status);
+            }
 
             unset($pids[$pid]);
         }
