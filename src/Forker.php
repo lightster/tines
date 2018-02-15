@@ -53,6 +53,8 @@ class Forker
 
             if (pcntl_wifexited($fork_status)) {
                 $exit_statuses[$pids[$pid]] = pcntl_wexitstatus($fork_status);
+            } elseif (pcntl_wifsignaled($fork_status)) {
+                $exit_statuses[$pids[$pid]] = -1 * pcntl_wtermsig($fork_status);
             }
 
             unset($pids[$pid]);

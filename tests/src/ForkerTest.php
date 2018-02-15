@@ -93,4 +93,18 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             ])
         );
     }
+
+    public function testSignalSentToChildProcessIsReturnedAsNegativeExitCode()
+    {
+        $forker = new Forker();
+
+        $this->assertEquals(
+            ['zero' => -15],
+            $forker->fork([
+                'zero'  => function () {
+                    posix_kill(posix_getpid(), SIGTERM);
+                },
+            ])
+        );
+    }
 }
