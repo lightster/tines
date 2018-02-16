@@ -48,7 +48,7 @@ class Forker
             $pid = pcntl_wait($fork_status);
 
             if (-1 == $pid) {
-                throw new Exception("Could not get the status of remaining forks.");
+                continue;
             }
 
             if (pcntl_wifexited($fork_status)) {
