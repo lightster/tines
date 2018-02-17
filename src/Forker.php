@@ -6,8 +6,19 @@ use Exception;
 
 class Forker
 {
+    /**
+     * @var array
+     */
+    private $forks;
+
+    /**
+     * @var array
+     */
+    private $options;
+
     public function __construct(array $options = [])
     {
+        $this->forks = [];
         $this->options = $options + [
             'child.init'          => null,
             'child.process-title' => null,
@@ -15,15 +26,25 @@ class Forker
     }
 
     /**
-     * @param array $fork_callbacks
+     * @param callable $fork_callback
+     * @param string $fork_name
+     */
+    public function add(callable $fork_callback, $fork_name)
+    {
+        $this->forks[$fork_name] = [
+            'callback' => $fork_callback,
+        ];
+    }
+
+    /**
      * @return array
      * @throws Exception
      */
-    public function fork(array $fork_callbacks)
+    public function run()
     {
         $pids = [];
 
-        foreach ($fork_callbacks as $fork_name => $fork_callback) {
+        foreach ($this->forks as $fork_name => $fork) {
             $pid = pcntl_fork();
 
             if (-1 == $pid) {
@@ -35,7 +56,7 @@ class Forker
 
                 $this->callCallback($this->options['child.init']);
 
-                $exit_status = (int)call_user_func($fork_callback, $fork_name);
+                $exit_status = (int)call_user_func($fork['callback'], $fork_name);
                 exit($exit_status);
             }
 
@@ -61,6 +82,20 @@ class Forker
         }
 
         return $exit_statuses;
+    }
+
+    /**
+     * @param array $fork_callbacks
+     * @return array
+     * @throws Exception
+     */
+    public function fork(array $fork_callbacks)
+    {
+        foreach ($fork_callbacks as $fork_name => $fork_callback) {
+            $this->add($fork_callback, $fork_name);
+        }
+
+        return $this->run();
     }
 
     /**
