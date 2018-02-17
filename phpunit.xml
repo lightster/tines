@@ -7,7 +7,6 @@
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
-    forceCoversAnnotation="true"
 >
 
     <testsuites>
@@ -21,16 +20,7 @@
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-html"
-            target="tests/log/coverage"
-            charset="UTF-8"
-            yui="true"
-            highlight="false"
-            lowUpperBound="70"
-            highLowerBound="90"
-        />
         <log type="testdox-html" target="tests/log/testdox.html"/>
-        <log type="coverage-clover" target="tests/log/coverage.xml" />
     </logging>
     <php>
         <ini name="error_reporting" value="E_ALL" />
