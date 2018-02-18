@@ -27,12 +27,22 @@ class Forker
 
     /**
      * @param callable $fork_callback
-     * @param string $fork_name
+     * @param array|null $options
+     * @param array|null $data
      */
-    public function add(callable $fork_callback, $fork_name)
+    public function add(callable $fork_callback, array $options = null, array $data = null)
     {
-        $this->forks[$fork_name] = [
+        if (null === $options) {
+            $options = [];
+        }
+        if (null === $data) {
+            $data = [];
+        }
+
+        $this->forks[] = [
             'callback' => $fork_callback,
+            'options'  => $options,
+            'data'     => $data,
         ];
     }
 
@@ -46,6 +56,10 @@ class Forker
 
         foreach ($this->forks as $fork_name => $fork) {
             $pid = pcntl_fork();
+
+            if (!empty($fork['data']['fork_name'])) {
+                $fork_name = $fork['data']['fork_name'];
+            }
 
             if (-1 == $pid) {
                 throw new Exception("Could not create fork #{$fork_name}.");
@@ -92,7 +106,7 @@ class Forker
     public function fork(array $fork_callbacks)
     {
         foreach ($fork_callbacks as $fork_name => $fork_callback) {
-            $this->add($fork_callback, $fork_name);
+            $this->add($fork_callback, null, ['fork_name' => $fork_name]);
         }
 
         return $this->run();
