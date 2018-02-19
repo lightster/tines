@@ -11,13 +11,13 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $forker = new Forker();
 
         $exit_statuses = $forker->fork([
-            'zero' => function() {
+            'zero' => function () {
                 return 0;
             },
-            'two' => function() {
+            'two' => function () {
                 return 2;
             },
-            'three' => function() {
+            'three' => function () {
                 return 3;
             },
         ]);
@@ -35,19 +35,19 @@ class ForkerTest extends PHPUnit_Framework_TestCase
     public function testChildInit()
     {
         $forker = new Forker([
-            'child.init' => function() {
+            'child.init' => function () {
                 exit(4);
             }
         ]);
 
         $exit_statuses = $forker->fork([
-            'zero' => function() {
+            'zero' => function () {
                 return 0;
             },
-            'two' => function() {
+            'two' => function () {
                 return 2;
             },
-            'three' => function() {
+            'three' => function () {
                 return 3;
             },
         ]);
