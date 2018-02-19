@@ -22,6 +22,8 @@ class Forker
         $this->options = $options + [
             'child.init'          => null,
             'child.process-title' => null,
+            'child.exit-status'   => null,
+            'child.exit-signal'   => null,
         ];
     }
 
@@ -54,9 +56,10 @@ class Forker
     {
         $pids = [];
 
-        foreach ($this->forks as $fork_name => $fork) {
+        foreach ($this->forks as $fork_idx => $fork) {
             $pid = pcntl_fork();
 
+            $fork_name = $fork_idx;
             if (!empty($fork['data']['fork_name'])) {
                 $fork_name = $fork['data']['fork_name'];
             }
@@ -74,7 +77,7 @@ class Forker
                 exit($exit_status);
             }
 
-            $pids[$pid] = $fork_name;
+            $pids[$pid] = $fork_idx;
         }
 
         $exit_statuses = [];
@@ -86,11 +89,20 @@ class Forker
                 continue;
             }
 
+            $fork = $this->forks[$pids[$pid]];
+
+            $exit_status = null;
             if (pcntl_wifexited($fork_status)) {
-                $exit_statuses[$pids[$pid]] = pcntl_wexitstatus($fork_status);
+                $exit_status = pcntl_wexitstatus($fork_status);
+                $this->callCallback($this->options['child.exit-status'], $exit_status, $fork['data']);
             } elseif (pcntl_wifsignaled($fork_status)) {
-                $exit_statuses[$pids[$pid]] = -1 * pcntl_wtermsig($fork_status);
+                $exit_signal = pcntl_wtermsig($fork_status);
+                $this->callCallback($this->options['child.exit-signal'], $exit_signal, $fork['data']);
+
+                $exit_status = -1 * $exit_signal;
             }
+
+            $exit_statuses[$pids[$pid]] = $exit_status;
 
             unset($pids[$pid]);
         }
@@ -109,7 +121,14 @@ class Forker
             $this->add($fork_callback, null, ['fork_name' => $fork_name]);
         }
 
-        return $this->run();
+        $exit_statuses = $this->run();
+        $mapped_statuses = [];
+        $fork_names = array_keys($fork_callbacks);
+        foreach ($exit_statuses as $fork_idx => $exit_status) {
+            $mapped_statuses[$fork_names[$fork_idx]] = $exit_status;
+        }
+
+        return $mapped_statuses;
     }
 
     /**

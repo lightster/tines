@@ -107,4 +107,50 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             ])
         );
     }
+
+    public function testExitStatusCallbackReceivesExpectedExitCode()
+    {
+        $expected_values = [
+            'zero'  => 0,
+            'two'   => 2,
+            'three' => 3,
+        ];
+
+        $forker = new Forker([
+            'child.exit-status' => function ($exit_status, $fork_data) use ($expected_values) {
+                $this->assertSame($expected_values[$fork_data['fork_name']], $exit_status);
+            },
+        ]);
+
+        foreach ($expected_values as $fork_name => $exit_code) {
+            $forker->add(
+                function () use ($exit_code) {
+                    return $exit_code;
+                },
+                null,
+                [
+                    'fork_name' => $fork_name,
+                ]
+            );
+        }
+
+        $forker->run();
+    }
+
+    public function testExitSignalCallbackReceivesExpectedExitSignal()
+    {
+        $forker = new Forker([
+            'child.exit-signal' => function ($exit_signal) {
+                $this->assertSame(15, $exit_signal);
+            },
+        ]);
+
+        $forker->add(
+            function () {
+                posix_kill(posix_getpid(), SIGTERM);
+            }
+        );
+
+        $forker->run();
+    }
 }
