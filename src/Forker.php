@@ -89,20 +89,12 @@ class Forker
                 continue;
             }
 
-            $fork = $this->forks[$pids[$pid]];
+            $fork_idx = $pids[$pid];
+            $fork = $this->forks[$fork_idx];
 
-            $exit_status = null;
-            if (pcntl_wifexited($fork_status)) {
-                $exit_status = pcntl_wexitstatus($fork_status);
-                $this->callCallback($this->options['child.exit-status'], $exit_status, $fork['data']);
-            } elseif (pcntl_wifsignaled($fork_status)) {
-                $exit_signal = pcntl_wtermsig($fork_status);
-                $this->callCallback($this->options['child.exit-signal'], $exit_signal, $fork['data']);
+            $exit_status = $this->getExitStatus($fork, $fork_status);
 
-                $exit_status = -1 * $exit_signal;
-            }
-
-            $exit_statuses[$pids[$pid]] = $exit_status;
+            $exit_statuses[$fork_idx] = $exit_status;
 
             unset($pids[$pid]);
         }
@@ -173,5 +165,27 @@ class Forker
         $existing_title = implode(' ', $command_string);
 
         return $existing_title;
+    }
+
+    /**
+     * @param array $fork
+     * @param int $fork_status
+     * @return int|null
+     */
+    private function getExitStatus($fork, $fork_status)
+    {
+        if (pcntl_wifexited($fork_status)) {
+            $exit_status = pcntl_wexitstatus($fork_status);
+            $this->callCallback($this->options['child.exit-status'], $exit_status, $fork['data']);
+
+            return $exit_status;
+        } elseif (pcntl_wifsignaled($fork_status)) {
+            $exit_signal = pcntl_wtermsig($fork_status);
+            $this->callCallback($this->options['child.exit-signal'], $exit_signal, $fork['data']);
+
+            return -1 * $exit_signal;
+        }
+
+        return null;
     }
 }
