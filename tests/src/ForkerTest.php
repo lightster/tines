@@ -2,6 +2,7 @@
 
 namespace Lstr\Tines;
 
+use Exception;
 use PHPUnit_Framework_TestCase;
 
 class ForkerTest extends PHPUnit_Framework_TestCase
@@ -148,6 +149,30 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $forker->add(
             function () {
                 posix_kill(posix_getpid(), SIGTERM);
+            }
+        );
+
+        $forker->run();
+    }
+
+    public function testAForkCannotReuseTheForkerFromTheParent()
+    {
+        $forker = new Forker([
+            'child.exit-status' => function ($exit_status) {
+                $this->assertSame(234, $exit_status);
+            },
+        ]);
+
+        $forker->add(
+            function () use ($forker) {
+                try {
+                    $forker->add(function () {
+                    });
+                } catch (Exception $ex) {
+                    return 234;
+                }
+
+                return 0;
             }
         );
 

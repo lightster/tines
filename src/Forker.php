@@ -7,6 +7,11 @@ use Exception;
 class Forker
 {
     /**
+     * @var bool
+     */
+    private $has_ran = false;
+
+    /**
      * @var array
      */
     private $forks;
@@ -31,9 +36,14 @@ class Forker
      * @param callable $fork_callback
      * @param array|null $options
      * @param array|null $data
+     * @throws Exception
      */
     public function add(callable $fork_callback, array $options = null, array $data = null)
     {
+        if ($this->has_ran) {
+            throw new Exception("The fork set has already ran and a new fork cannot be added.");
+        }
+
         if (null === $options) {
             $options = [];
         }
@@ -54,6 +64,8 @@ class Forker
      */
     public function run()
     {
+        $this->has_ran = true;
+
         $pids = [];
 
         foreach ($this->forks as $fork_idx => $fork) {
