@@ -92,7 +92,7 @@ class Forker
             $fork_idx = $pids[$pid];
             $fork = $this->forks[$fork_idx];
 
-            $exit_status = $this->getExitStatus($fork, $fork_status);
+            $exit_status = $this->handleExitStatus($fork, $fork_status);
 
             $exit_statuses[$fork_idx] = $exit_status;
 
@@ -172,7 +172,7 @@ class Forker
      * @param int $fork_status
      * @return int|null
      */
-    private function getExitStatus($fork, $fork_status)
+    private function handleExitStatus($fork, $fork_status)
     {
         if (pcntl_wifexited($fork_status)) {
             $exit_status = pcntl_wexitstatus($fork_status);
