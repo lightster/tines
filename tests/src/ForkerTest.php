@@ -71,10 +71,10 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             },
         ]);
 
-        $process_title_check = function ($fork_name) {
+        $process_title_check = function ($fork_data) {
             if (strpos(cli_get_process_title(), 'phpunit') === false) {
                 return 1;
-            } elseif (strpos(cli_get_process_title(), $fork_name) === false) {
+            } elseif (strpos(cli_get_process_title(), $fork_data['fork_name']) === false) {
                 return 2;
             }
 

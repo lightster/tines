@@ -90,7 +90,7 @@ class Forker
 
                 $this->callCallback($this->options['child.init']);
 
-                $exit_status = (int)call_user_func($fork['callback'], $fork_name);
+                $exit_status = (int)call_user_func($fork['callback'], $fork['data']);
                 exit($exit_status);
             }
 
