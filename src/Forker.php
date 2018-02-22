@@ -21,6 +21,11 @@ class Forker
      */
     private $options;
 
+    /**
+     * @var int[]
+     */
+    private $pids;
+
     public function __construct(array $options = [])
     {
         $this->forks = [];
@@ -66,7 +71,7 @@ class Forker
     {
         $this->has_ran = true;
 
-        $pids = [];
+        $this->pids = [];
 
         foreach ($this->forks as $fork_idx => $fork) {
             $pid = pcntl_fork();
@@ -89,11 +94,11 @@ class Forker
                 exit($exit_status);
             }
 
-            $pids[$pid] = $fork_idx;
+            $this->pids[$pid] = $fork_idx;
         }
 
         $exit_statuses = [];
-        while ($pids) {
+        while ($this->pids) {
             $fork_status = null;
             $pid = pcntl_wait($fork_status);
 
@@ -101,14 +106,14 @@ class Forker
                 continue;
             }
 
-            $fork_idx = $pids[$pid];
+            $fork_idx = $this->pids[$pid];
             $fork = $this->forks[$fork_idx];
 
             $exit_status = $this->handleExitStatus($fork, $fork_status);
 
             $exit_statuses[$fork_idx] = $exit_status;
 
-            unset($pids[$pid]);
+            unset($this->pids[$pid]);
         }
 
         return $exit_statuses;
