@@ -66,7 +66,7 @@ class ForkerTest extends PHPUnit_Framework_TestCase
     public function testProcessTitlesCanBeSet()
     {
         $forker = new Forker([
-            'child.process-title' => function ($process_name, $fork_name) {
+            'child.process_title' => function ($process_name, $fork_name) {
                 return "{$process_name} ({$fork_name})";
             },
         ]);
@@ -118,7 +118,7 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         ];
 
         $forker = new Forker([
-            'child.exit-status' => function ($exit_status, $fork_data) use ($expected_values) {
+            'child.exit_status' => function ($exit_status, $fork_data) use ($expected_values) {
                 $this->assertSame($expected_values[$fork_data['fork_name']], $exit_status);
             },
         ]);
@@ -141,7 +141,7 @@ class ForkerTest extends PHPUnit_Framework_TestCase
     public function testExitSignalCallbackReceivesExpectedExitSignal()
     {
         $forker = new Forker([
-            'child.exit-signal' => function ($exit_signal) {
+            'child.exit_signal' => function ($exit_signal) {
                 $this->assertSame(15, $exit_signal);
             },
         ]);
@@ -158,7 +158,7 @@ class ForkerTest extends PHPUnit_Framework_TestCase
     public function testAForkCannotReuseTheForkerFromTheParent()
     {
         $forker = new Forker([
-            'child.exit-status' => function ($exit_status) {
+            'child.exit_status' => function ($exit_status) {
                 $this->assertSame(234, $exit_status);
             },
         ]);

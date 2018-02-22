@@ -31,9 +31,9 @@ class Forker
         $this->forks = [];
         $this->options = $options + [
             'child.init'          => null,
-            'child.process-title' => null,
-            'child.exit-status'   => null,
-            'child.exit-signal'   => null,
+            'child.process_title' => null,
+            'child.exit_status'   => null,
+            'child.exit_signal'   => null,
         ];
     }
 
@@ -161,7 +161,7 @@ class Forker
         $existing_title = $this->getExistingProcessTitle();
 
         $proc_title = $this->callCallback(
-            $this->options['child.process-title'],
+            $this->options['child.process_title'],
             $existing_title,
             $fork_name
         );
@@ -193,12 +193,12 @@ class Forker
     {
         if (pcntl_wifexited($fork_status)) {
             $exit_status = pcntl_wexitstatus($fork_status);
-            $this->callCallback($this->options['child.exit-status'], $exit_status, $fork['data']);
+            $this->callCallback($this->options['child.exit_status'], $exit_status, $fork['data']);
 
             return $exit_status;
         } elseif (pcntl_wifsignaled($fork_status)) {
             $exit_signal = pcntl_wtermsig($fork_status);
-            $this->callCallback($this->options['child.exit-signal'], $exit_signal, $fork['data']);
+            $this->callCallback($this->options['child.exit_signal'], $exit_signal, $fork['data']);
 
             return -1 * $exit_signal;
         }
