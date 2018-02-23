@@ -65,11 +65,7 @@ class ForkerTest extends PHPUnit_Framework_TestCase
 
     public function testProcessTitlesCanBeSet()
     {
-        $forker = new Forker([
-            'child.process_title' => function ($process_name, $fork_name) {
-                return "{$process_name} ({$fork_name})";
-            },
-        ]);
+        $forker = new Forker();
 
         $process_title_check = function ($fork_data) {
             if (strpos(cli_get_process_title(), 'phpunit') === false) {
@@ -81,17 +77,25 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             return 0;
         };
 
+        $forker->add(
+            $process_title_check,
+            ['process_title' => 'phpunit (zero)'],
+            ['fork_name' => 'zero']
+        );
+        $forker->add(
+            $process_title_check,
+            ['process_title' => 'phpunit (two)'],
+            ['fork_name' => 'two']
+        );
+        $forker->add(
+            $process_title_check,
+            ['process_title' => 'phpunit (three)'],
+            ['fork_name' => 'three']
+        );
+
         $this->assertEquals(
-            [
-                'zero'  => 0,
-                'two'   => 0,
-                'three' => 0,
-            ],
-            $forker->fork([
-                'zero'  => $process_title_check,
-                'two'   => $process_title_check,
-                'three' => $process_title_check,
-            ])
+            [0, 0, 0],
+            $forker->run()
         );
     }
 

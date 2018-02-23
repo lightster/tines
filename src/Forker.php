@@ -31,7 +31,6 @@ class Forker
         $this->forks = [];
         $this->options = $options + [
             'child.init'          => null,
-            'child.process_title' => null,
             'child.exit_status'   => null,
             'child.exit_signal'   => null,
         ];
@@ -86,7 +85,7 @@ class Forker
             }
 
             if (!$pid) {
-                $this->setProcessTitle($fork_name);
+                $this->setProcessTitle($fork);
 
                 $this->callCallback($this->options['child.init']);
 
@@ -156,32 +155,16 @@ class Forker
         return call_user_func_array($callback, $args);
     }
 
-    private function setProcessTitle($fork_name)
+    private function setProcessTitle(array $fork)
     {
-        $existing_title = $this->getExistingProcessTitle();
-
-        $proc_title = $this->callCallback(
-            $this->options['child.process_title'],
-            $existing_title,
-            $fork_name
-        );
+        $proc_title = null;
+        if (!empty($fork['options']['process_title'])) {
+            $proc_title = $fork['options']['process_title'];
+        }
 
         if ($proc_title && function_exists('cli_set_process_title')) {
             cli_set_process_title($proc_title);
         }
-    }
-
-    private function getExistingProcessTitle()
-    {
-        $existing_title = cli_get_process_title();
-        if ($existing_title) {
-            return $existing_title;
-        }
-
-        $command_string = array_map('escapeshellarg', $_SERVER['argv']);
-        $existing_title = implode(' ', $command_string);
-
-        return $existing_title;
     }
 
     /**
