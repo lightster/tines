@@ -30,6 +30,9 @@ class Forker
     {
         $this->forks = [];
         $this->options = $options + [
+            'child.fork_failed'   => function ($fork_idx) {
+                throw new Exception("Could not create fork #{$fork_idx}.");
+            },
             'child.init'          => null,
             'child.exit_status'   => null,
             'child.exit_signal'   => null,
@@ -64,7 +67,6 @@ class Forker
 
     /**
      * @return array
-     * @throws Exception
      */
     public function run()
     {
@@ -75,13 +77,9 @@ class Forker
         foreach ($this->forks as $fork_idx => $fork) {
             $pid = pcntl_fork();
 
-            $fork_name = $fork_idx;
-            if (!empty($fork['data']['fork_name'])) {
-                $fork_name = $fork['data']['fork_name'];
-            }
-
             if (-1 == $pid) {
-                throw new Exception("Could not create fork #{$fork_name}.");
+                $this->callCallback($this->options['child.fork_failed'], $fork_idx, $fork['data']);
+                continue;
             }
 
             if (!$pid) {
