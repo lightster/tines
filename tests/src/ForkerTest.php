@@ -182,4 +182,24 @@ class ForkerTest extends PHPUnit_Framework_TestCase
 
         $forker->run();
     }
+
+    public function testProcessTimeoutsCanBeSet()
+    {
+        $forker = new Forker();
+
+        $process_title_check = function () {
+            sleep(120);
+
+            return 0;
+        };
+
+        $forker->add($process_title_check, ['timeout' => 1]);
+        $forker->add($process_title_check, ['timeout' => 1]);
+        $forker->add($process_title_check, ['timeout' => 2]);
+
+        $this->assertEquals(
+            [-15, -15, -15],
+            $forker->run()
+        );
+    }
 }

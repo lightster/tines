@@ -26,6 +26,8 @@ class Forker
      */
     private $pids;
 
+    private $timeouts = [];
+
     public function __construct(array $options = [])
     {
         $this->forks = [];
@@ -74,6 +76,10 @@ class Forker
 
         $this->pids = [];
 
+        pcntl_signal(SIGALRM, function () {
+            $this->handleTimeouts();
+        });
+
         foreach ($this->forks as $fork_idx => $fork) {
             $pid = pcntl_fork();
 
@@ -85,19 +91,33 @@ class Forker
             if (!$pid) {
                 $this->setProcessTitle($fork);
 
+                pcntl_signal(SIGALRM, SIG_DFL);
+
                 $this->callCallback($this->options['child.init']);
 
-                $exit_status = (int)call_user_func($fork['callback'], $fork['data']);
+                $exit_status = (int) call_user_func($fork['callback'], $fork['data']);
                 exit($exit_status);
+            }
+
+            if (isset($fork['options']['timeout'])) {
+                $this->timeouts[] = [
+                    'pid'             => $pid,
+                    'signal'          => SIGTERM,
+                    'expiration_time' => time() + $fork['options']['timeout'],
+                ];
             }
 
             $this->pids[$pid] = $fork_idx;
         }
 
+        $this->handleTimeouts();
+
         $exit_statuses = [];
         while ($this->pids) {
             $fork_status = null;
-            $pid = pcntl_wait($fork_status);
+            declare (ticks = 1) {
+                $pid = pcntl_wait($fork_status);
+            }
 
             if (-1 == $pid) {
                 continue;
@@ -185,5 +205,29 @@ class Forker
         }
 
         return null;
+    }
+
+    private function handleTimeouts()
+    {
+        $next_alarm = null;
+
+        foreach ($this->timeouts as &$timeout) {
+            if (!empty($timeout['signaled'])) {
+                continue;
+            }
+
+            if ($timeout['expiration_time'] > time()) {
+                $expiration_time = $timeout['expiration_time'];
+                $next_alarm = min($expiration_time, $next_alarm) ?: $expiration_time;
+                continue;
+            }
+
+            posix_kill($timeout['pid'], $timeout['signal']);
+            $timeout['signaled'] = true;
+        }
+
+        if ($next_alarm) {
+            pcntl_alarm($next_alarm - time());
+        }
     }
 }
