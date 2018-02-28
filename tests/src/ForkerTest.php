@@ -202,4 +202,20 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             $forker->run()
         );
     }
+
+    public function testChildDoesNotHaveAlarmSignalHandlerSet()
+    {
+        $forker = new Forker();
+
+        $process_title_check = function () {
+            posix_kill(getmypid(), SIGALRM);
+            pcntl_signal_dispatch();
+
+            return 0;
+        };
+
+        $forker->add($process_title_check, ['timeout' => 1]);
+
+        $this->assertEquals([-SIGALRM], $forker->run());
+    }
 }
