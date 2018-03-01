@@ -99,13 +99,7 @@ class Forker
                 exit($exit_status);
             }
 
-            if (isset($fork['options']['timeout'])) {
-                $this->timeouts[] = [
-                    'pid'             => $pid,
-                    'signal'          => SIGTERM,
-                    'expiration_time' => time() + $fork['options']['timeout'],
-                ];
-            }
+            $this->addTimeoutsForFork($fork, $pid);
 
             $this->pids[$pid] = $fork_idx;
         }
@@ -228,6 +222,25 @@ class Forker
 
         if ($next_alarm) {
             pcntl_alarm($next_alarm - time());
+        }
+    }
+
+    private function addTimeoutsForFork(array $fork, $pid)
+    {
+        $timeouts = [];
+        if (isset($fork['options']['timeout'])) {
+            $timeouts[] = [
+                'signal' => SIGTERM,
+                'timeout' => $fork['options']['timeout'],
+            ];
+        }
+
+        foreach ($timeouts as $timeout) {
+            $this->timeouts[] = [
+                'pid'             => $pid,
+                'signal'          => $timeout['signal'],
+                'expiration_time' => time() + $timeout['timeout'],
+            ];
         }
     }
 }
