@@ -203,6 +203,47 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMultipleTimeoutsCanBeSetForOneProcess()
+    {
+        $forker = new Forker();
+
+        $process_title_check = function () {
+            $result = 0;
+            $done = false;
+            $signal_handler = function ($signal_number) use (&$result) {
+                $result += $signal_number;
+            };
+
+            pcntl_signal(SIGTERM, $signal_handler, true);
+            pcntl_signal(SIGHUP, $signal_handler, true);
+            pcntl_signal(SIGQUIT, function () use (&$done) {
+                $done = true;
+            });
+
+            declare (ticks = 1) {
+                while (!$done) {
+                    sleep(4);
+                }
+            }
+
+            return $result;
+        };
+
+        $forker->add($process_title_check, [
+            'timeouts' => [
+                ['signal' => SIGTERM, 'timeout' => 1],
+                ['signal' => SIGHUP,  'timeout' => 1],
+                ['signal' => SIGQUIT, 'timeout' => 3],
+            ],
+            'timeout' => 2,
+        ]);
+
+        $this->assertEquals(
+            [(SIGTERM * 2) + SIGHUP],
+            $forker->run()
+        );
+    }
+
     public function testChildDoesNotHaveAlarmSignalHandlerSet()
     {
         $forker = new Forker();

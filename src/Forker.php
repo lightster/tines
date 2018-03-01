@@ -228,6 +228,9 @@ class Forker
     private function addTimeoutsForFork(array $fork, $pid)
     {
         $timeouts = [];
+        if (isset($fork['options']['timeouts'])) {
+            $timeouts = $fork['options']['timeouts'];
+        }
         if (isset($fork['options']['timeout'])) {
             $timeouts[] = [
                 'signal' => SIGTERM,
