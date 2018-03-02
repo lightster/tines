@@ -26,8 +26,14 @@ class Forker
      */
     private $pids;
 
+    /**
+     * @var array
+     */
     private $timeouts = [];
 
+    /**
+     * @param array $options
+     */
     public function __construct(array $options = [])
     {
         $this->forks = [];
@@ -167,6 +173,9 @@ class Forker
         return call_user_func_array($callback, $args);
     }
 
+    /**
+     * @param array $fork
+     */
     private function setProcessTitle(array $fork)
     {
         $proc_title = null;
@@ -225,6 +234,10 @@ class Forker
         }
     }
 
+    /**
+     * @param array $fork
+     * @param int $pid
+     */
     private function addTimeoutsForFork(array $fork, $pid)
     {
         $timeouts = [];
