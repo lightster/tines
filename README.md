@@ -57,3 +57,83 @@ $exit_codes = $forker->run();
 
 If you run `ps aux` on the command line while both forks are still running, you will see processes
 titled 'light-sleeper' and 'heavy-sleeper'.
+
+### Fork Process Timeouts
+
+Sometimes a process will run longer than anticipated, in which case it might be best for the process
+to be terminated after a certain amount of time.  There are a few fork options that allow for
+timeouts to be set on the fork process.
+
+The first is the simple `timeout` options, which is the amount of time in seconds to allow the fork
+to run:
+
+```php
+$forker = new \Tines\Forker();
+$forker->add(
+    function () {
+        sleep(60);
+    },
+    [
+        'process_title' => 'light-sleeper'
+        'timeout'       => 5,
+    ],
+);
+$forker->add(
+    function () {
+        sleep(3600);
+    },
+    [
+        'process_title' => 'heavy-sleeper'
+        'timeout'       => 10,
+    ],
+);
+
+$exit_codes = $forker->run();
+```
+
+After 5 seconds the 'light-sleeper' child process will be sent a SIGTERM signal and will terminate.
+After 10 seconds, the 'heavy-sleeper' child process will be sent a SIGTERM signal and will terminate.
+
+#### Advanced Timeouts
+
+If a signal other than SIGTERM needs to be sent to the process, the `timeouts` (with an 's') can be
+used:
+
+```php
+$forker = new \Tines\Forker();
+$forker->add(
+    function () {
+        sleep(60);
+    },
+    [
+        'process_title' => 'light-sleeper'
+        'timeouts'      => [
+            ['signal' => SIGHUP,  'timeout' => 10],
+        ],
+    ],
+);
+$forker->add(
+    function () {
+        pcntl_signal(SIGTERM, function ($signal_number) {
+            echo "You're going to have to try harder than that.";
+            sleep(3600);
+        });
+        sleep(3600);
+    },
+    [
+        'process_title' => 'heavy-sleeper'
+        'timeouts'      => [
+            ['signal' => SIGTERM,  'timeout' => 10],
+            ['signal' => SIGKILL,  'timeout' => 60],
+        ],
+    ],
+);
+
+$exit_codes = $forker->run();
+```
+
+The light-sleeper process is set to receive a SIGHUP signal after 10 seconds.
+
+The heavy-sleeper process is set to receive a SIGTERM after 10 seconds, but the child process has a
+signal handler that prevents the SIGTERM from causing the process to terminate.  The fork also has a
+timeout that will trigger a SIGKILL after 60 seconds.
