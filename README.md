@@ -64,7 +64,7 @@ Sometimes a process will run longer than anticipated, in which case it might be 
 to be terminated after a certain amount of time.  There are a few fork options that allow for
 timeouts to be set on the fork process.
 
-The first is the simple `timeout` options, which is the amount of time in seconds to allow the fork
+The first is the simple `timeout` option, which is the amount of time in seconds to allow the fork
 to run:
 
 ```php
