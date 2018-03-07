@@ -50,10 +50,10 @@ class Forker
     /**
      * @param callable $fork_callback
      * @param array|null $options
-     * @param array|null $data
+     * @param mixed $data
      * @throws Exception
      */
-    public function add(callable $fork_callback, array $options = null, array $data = null)
+    public function add(callable $fork_callback, array $options = null, $data = null)
     {
         if ($this->has_ran) {
             throw new Exception("The fork set has already ran and a new fork cannot be added.");
@@ -61,9 +61,6 @@ class Forker
 
         if (null === $options) {
             $options = [];
-        }
-        if (null === $data) {
-            $data = [];
         }
 
         $this->forks[] = [
