@@ -137,3 +137,41 @@ The light-sleeper process is set to receive a SIGHUP signal after 10 seconds.
 The heavy-sleeper process is set to receive a SIGTERM after 10 seconds, but the child process has a
 signal handler that prevents the SIGTERM from causing the process to terminate.  The fork also has a
 timeout that will trigger a SIGKILL after 60 seconds.
+
+## Forker Options
+
+In addition to being able to pass options to each fork, the `Forker` constructor accepts some useful
+options.
+
+### Initializing the child with the `child.init` callback option
+
+Before each fork's callback is called, the `child.init` callback method is called.  This is useful
+if the parent has database or other data store connections (e.g. PostgreSQL, MySQL, RabbitMQ) open.
+Generally these connections need to be re-initialized in the child process or need to otherwise be
+specially handled.  Doing this processing in the `child.init` Forker callback ensures that this
+special handling happens for each fork without needing to repeat the logic in each fork's callback
+method.
+
+The `child.init` callback can be provided like so:
+
+```php
+$forker = new \Tines\Forker([
+    'child.init' => function () {
+        echo "Child cleaning up... and ready to go!\n",
+    },
+]);
+$forker->add(
+    function () {
+        echo "Lightly sleeping\n";
+    },
+    ['process_title' => 'light-sleeper']
+);
+$forker->add(
+    function () {
+        echo "Zonked out\n";
+    },
+    ['process_title' => 'heavy-sleeper']
+);
+
+$exit_codes = $forker->run();
+```
