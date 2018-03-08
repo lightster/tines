@@ -138,6 +138,11 @@ The heavy-sleeper process is set to receive a SIGTERM after 10 seconds, but the 
 signal handler that prevents the SIGTERM from causing the process to terminate.  The fork also has a
 timeout that will trigger a SIGKILL after 60 seconds.
 
+## Passing in Fork Data
+
+The third parameter passed to `$forker->add()` is an array of options for the forker to use when
+creating and handling the fork.
+
 ## Forker Options
 
 In addition to being able to pass options to each fork, the `Forker` constructor accepts some useful
