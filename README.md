@@ -141,7 +141,25 @@ timeout that will trigger a SIGKILL after 60 seconds.
 ## Passing in Fork Data
 
 The third parameter passed to `$forker->add()` is an array of options for the forker to use when
-creating and handling the fork.
+creating and handling the fork:
+
+```php
+$sleep = function ($data) {
+    sleep($data['sleep_length']);
+};
+
+$forker = new \Tines\Forker();
+$forker->add(
+    $sleep,
+    ['process_title' => 'light-sleeper'],
+    ['sleep_length' => 5],
+);
+$forker->add(
+    $sleep,
+    ['process_title' => 'heavy-sleeper'],
+    ['sleep_length' => 60],
+);
+```
 
 ## Forker Options
 
