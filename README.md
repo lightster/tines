@@ -26,14 +26,6 @@ echo implode(', ', $exit_codes);
 # 2, 0, 1
 ```
 
-Keep in mind that forking causes the parent process to be copied to the child process.
-This means that PHP resource types such as database or other data store connections
-(e.g. PostgreSQL, MySQL, RabbitMQ) will be copied.  Generally these connections need to be
-re-initialized in the child process or need to otherwise be specially handled.  Usually the best
-place to handle re-initialization of these types of resources is in the `child.init` forker callback
-option, as discussed in
-[initializing the child with the `child.init `callback option](#initializing-the-child-with-the-childinit-callback-option).
-
 ## Passing in Fork Options
 
 The second parameter passed to `$forker->add()` is an array of options for the forker to use when
@@ -168,6 +160,14 @@ $forker->add(
     ['sleep_length' => 60],
 );
 ```
+
+Keep in mind that forking causes the parent process to be copied to the child process.
+This means that PHP resource types such as database or other data store connections
+(e.g. PostgreSQL, MySQL, RabbitMQ) will be copied.  Generally these connections need to be
+re-initialized in the child process or need to otherwise be specially handled.  Usually the best
+place to handle re-initialization of these types of resources is in the `child.init` forker callback
+option, as discussed in
+[initializing the child with the `child.init `callback option](#initializing-the-child-with-the-childinit-callback-option).
 
 ## Forker Options
 
