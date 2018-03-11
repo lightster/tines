@@ -134,27 +134,6 @@ class Forker
     }
 
     /**
-     * @param array $fork_callbacks
-     * @return array
-     * @throws Exception
-     */
-    public function fork(array $fork_callbacks)
-    {
-        foreach ($fork_callbacks as $fork_name => $fork_callback) {
-            $this->add($fork_callback, null, ['fork_name' => $fork_name]);
-        }
-
-        $exit_statuses = $this->run();
-        $mapped_statuses = [];
-        $fork_names = array_keys($fork_callbacks);
-        foreach ($exit_statuses as $fork_idx => $exit_status) {
-            $mapped_statuses[$fork_names[$fork_idx]] = $exit_status;
-        }
-
-        return $mapped_statuses;
-    }
-
-    /**
      * @param callable|null $callback
      * @return mixed
      */
