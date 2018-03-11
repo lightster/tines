@@ -11,26 +11,17 @@ class ForkerTest extends PHPUnit_Framework_TestCase
     {
         $forker = new Forker();
 
-        $exit_statuses = $forker->fork([
-            'zero' => function () {
-                return 0;
-            },
-            'two' => function () {
-                return 2;
-            },
-            'three' => function () {
-                return 3;
-            },
-        ]);
+        $forker->add(function () {
+            return 0;
+        });
+        $forker->add(function () {
+            return 2;
+        });
+        $forker->add(function () {
+            return 3;
+        });
 
-        $this->assertEquals(
-            [
-                'zero'  => 0,
-                'two'   => 2,
-                'three' => 3,
-            ],
-            $exit_statuses
-        );
+        $this->assertEquals([0, 2, 3], $forker->run());
     }
 
     public function testChildInit()
@@ -41,26 +32,17 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             }
         ]);
 
-        $exit_statuses = $forker->fork([
-            'zero' => function () {
-                return 0;
-            },
-            'two' => function () {
-                return 2;
-            },
-            'three' => function () {
-                return 3;
-            },
-        ]);
+        $forker->add(function () {
+            return 0;
+        });
+        $forker->add(function () {
+            return 2;
+        });
+        $forker->add(function () {
+            return 3;
+        });
 
-        $this->assertEquals(
-            [
-                'zero'  => 4,
-                'two'   => 4,
-                'three' => 4,
-            ],
-            $exit_statuses
-        );
+        $this->assertEquals([4, 4, 4], $forker->run());
     }
 
     public function testProcessTitlesCanBeSet()
@@ -93,24 +75,18 @@ class ForkerTest extends PHPUnit_Framework_TestCase
             ['fork_name' => 'three']
         );
 
-        $this->assertEquals(
-            [0, 0, 0],
-            $forker->run()
-        );
+        $this->assertEquals([0, 0, 0], $forker->run());
     }
 
     public function testSignalSentToChildProcessIsReturnedAsNegativeExitCode()
     {
         $forker = new Forker();
 
-        $this->assertEquals(
-            ['zero' => -15],
-            $forker->fork([
-                'zero'  => function () {
-                    posix_kill(posix_getpid(), SIGTERM);
-                },
-            ])
-        );
+        $forker->add(function () {
+            posix_kill(posix_getpid(), SIGTERM);
+        });
+
+        $this->assertEquals([-15], $forker->run());
     }
 
     public function testExitStatusCallbackReceivesExpectedExitCode()
