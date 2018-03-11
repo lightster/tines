@@ -7,6 +7,9 @@ use PHPUnit_Framework_TestCase;
 
 class ForkerTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @throws Exception
+     */
     public function testFork()
     {
         $forker = new Forker();
@@ -24,6 +27,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0, 2, 3], $forker->run());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testChildInit()
     {
         $forker = new Forker([
@@ -45,6 +51,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([4, 4, 4], $forker->run());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testProcessTitlesCanBeSet()
     {
         $forker = new Forker();
@@ -78,6 +87,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([0, 0, 0], $forker->run());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testSignalSentToChildProcessIsReturnedAsNegativeExitCode()
     {
         $forker = new Forker();
@@ -89,6 +101,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([-15], $forker->run());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testExitStatusCallbackReceivesExpectedExitCode()
     {
         $expected_values = [
@@ -118,6 +133,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $forker->run();
     }
 
+    /**
+     * @throws Exception
+     */
     public function testExitSignalCallbackReceivesExpectedExitSignal()
     {
         $forker = new Forker([
@@ -135,6 +153,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $forker->run();
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAForkCannotReuseTheForkerFromTheParent()
     {
         $forker = new Forker([
@@ -159,6 +180,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         $forker->run();
     }
 
+    /**
+     * @throws Exception
+     */
     public function testProcessTimeoutsCanBeSet()
     {
         $forker = new Forker();
@@ -179,6 +203,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function testMultipleTimeoutsCanBeSetForOneProcess()
     {
         $forker = new Forker();
@@ -220,6 +247,9 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function testChildDoesNotHaveAlarmSignalHandlerSet()
     {
         $forker = new Forker();
