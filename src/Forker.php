@@ -38,12 +38,11 @@ class Forker
     {
         $this->forks = [];
         $this->options = $options + [
-            'child.fork_failed'   => function ($fork_idx) {
+            'child.fork_failed' => function ($fork_idx) {
                 throw new Exception("Could not create fork #{$fork_idx}.");
             },
-            'child.init'          => null,
-            'child.exit_status'   => null,
-            'child.exit_signal'   => null,
+            'child.init'        => null,
+            'child.exit'        => null,
         ];
     }
 
@@ -173,12 +172,14 @@ class Forker
     {
         if (pcntl_wifexited($fork_status)) {
             $exit_status = pcntl_wexitstatus($fork_status);
-            $this->callCallback($this->options['child.exit_status'], $exit_status, $fork['data']);
+            $exit_info = ['type' => 'exit', 'status' => $exit_status, 'signal' => null];
+            $this->callCallback($this->options['child.exit'], $exit_info, $fork['data']);
 
             return $exit_status;
         } elseif (pcntl_wifsignaled($fork_status)) {
             $exit_signal = pcntl_wtermsig($fork_status);
-            $this->callCallback($this->options['child.exit_signal'], $exit_signal, $fork['data']);
+            $exit_info = ['type' => 'signal', 'status' => null, 'signal' => $exit_signal];
+            $this->callCallback($this->options['child.exit'], $exit_info, $fork['data']);
 
             return -1 * $exit_signal;
         }

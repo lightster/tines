@@ -113,8 +113,15 @@ class ForkerTest extends PHPUnit_Framework_TestCase
         ];
 
         $forker = new Forker([
-            'child.exit_status' => function ($exit_status, $fork_data) use ($expected_values) {
-                $this->assertSame($expected_values[$fork_data['fork_name']], $exit_status);
+            'child.exit' => function ($exit_info, $fork_data) use ($expected_values) {
+                $this->assertSame(
+                    [
+                        'type'   => 'exit',
+                        'status' => $expected_values[$fork_data['fork_name']],
+                        'signal' => null,
+                    ],
+                    $exit_info
+                );
             },
         ]);
 
@@ -139,8 +146,15 @@ class ForkerTest extends PHPUnit_Framework_TestCase
     public function testExitSignalCallbackReceivesExpectedExitSignal()
     {
         $forker = new Forker([
-            'child.exit_signal' => function ($exit_signal) {
-                $this->assertSame(15, $exit_signal);
+            'child.exit' => function ($exit_info) {
+                $this->assertSame(
+                    [
+                        'type'   => 'signal',
+                        'status' => null,
+                        'signal' => 15,
+                    ],
+                    $exit_info
+                );
             },
         ]);
 
@@ -159,8 +173,8 @@ class ForkerTest extends PHPUnit_Framework_TestCase
     public function testAForkCannotReuseTheForkerFromTheParent()
     {
         $forker = new Forker([
-            'child.exit_status' => function ($exit_status) {
-                $this->assertSame(234, $exit_status);
+            'child.exit' => function ($exit_info) {
+                $this->assertSame(234, $exit_info['status']);
             },
         ]);
 
