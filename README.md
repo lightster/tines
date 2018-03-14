@@ -165,29 +165,29 @@ Keep in mind that forking causes the parent process to be copied to the child pr
 This means that PHP resource types such as database or other data store connections
 (e.g. PostgreSQL, MySQL, RabbitMQ) will be copied.  Generally these connections need to be
 re-initialized in the child process or need to otherwise be specially handled.  Usually the best
-place to handle re-initialization of these types of resources is in the `child.init` forker callback
+place to handle re-initialization of these types of resources is in the `event.child_inited` forker callback
 option, as discussed in
-[initializing the child with the `child.init `callback option](#initializing-the-child-with-the-childinit-callback-option).
+[initializing the child with the `event.child_inited` callback option](#initializing-the-child-with-the-childinit-callback-option).
 
 ## Forker Options
 
 In addition to being able to pass options to each fork, the `Forker` constructor accepts some useful
 options.
 
-### Initializing the child with the `child.init` callback option
+### Initializing the child with the `event.child_inited` callback option
 
-Before each fork's callback is called, the `child.init` callback method is called.  This is useful
+Before each fork's callback is called, the `event.child_inited` callback method is called.  This is useful
 if the parent has database or other data store connections (e.g. PostgreSQL, MySQL, RabbitMQ) open.
 Generally these connections need to be re-initialized in the child process or need to otherwise be
-specially handled.  Doing this processing in the `child.init` Forker callback ensures that this
+specially handled.  Doing this processing in the `event.child_inited` Forker callback ensures that this
 special handling happens for each fork without needing to repeat the logic in each fork's callback
 method.
 
-The `child.init` callback can be provided like so:
+The `event.child_inited` callback can be provided like so:
 
 ```php
 $forker = new \Tines\Forker([
-    'child.init' => function () {
+    'event.child_inited' => function () {
         echo "Child cleaning up... and ready to go!\n",
     },
 ]);

@@ -38,11 +38,11 @@ class Forker
     {
         $this->forks = [];
         $this->options = $options + [
-            'child.fork_failed' => function ($fork_idx) {
+            'event.fork_failed'  => function ($fork_idx) {
                 throw new Exception("Could not create fork #{$fork_idx}.");
             },
-            'child.init'        => null,
-            'child.exit'        => null,
+            'event.child_inited' => null,
+            'event.child_exited' => null,
         ];
     }
 
@@ -86,7 +86,7 @@ class Forker
             $pid = pcntl_fork();
 
             if (-1 == $pid) {
-                $this->callCallback($this->options['child.fork_failed'], $fork_idx, $fork['data']);
+                $this->callCallback($this->options['event.fork_failed'], $fork_idx, $fork['data']);
                 continue;
             }
 
@@ -95,7 +95,7 @@ class Forker
 
                 pcntl_signal(SIGALRM, SIG_DFL);
 
-                $this->callCallback($this->options['child.init']);
+                $this->callCallback($this->options['event.child_inited']);
 
                 $exit_status = (int) call_user_func($fork['callback'], $fork['data']);
                 exit($exit_status);
@@ -173,13 +173,13 @@ class Forker
         if (pcntl_wifexited($fork_status)) {
             $exit_status = pcntl_wexitstatus($fork_status);
             $exit_info = ['type' => 'exit', 'status' => $exit_status, 'signal' => null];
-            $this->callCallback($this->options['child.exit'], $exit_info, $fork['data']);
+            $this->callCallback($this->options['event.child_exited'], $exit_info, $fork['data']);
 
             return $exit_status;
         } elseif (pcntl_wifsignaled($fork_status)) {
             $exit_signal = pcntl_wtermsig($fork_status);
             $exit_info = ['type' => 'signal', 'status' => null, 'signal' => $exit_signal];
-            $this->callCallback($this->options['child.exit'], $exit_info, $fork['data']);
+            $this->callCallback($this->options['event.child_exited'], $exit_info, $fork['data']);
 
             return -1 * $exit_signal;
         }
