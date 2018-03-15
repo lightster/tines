@@ -167,7 +167,7 @@ This means that PHP resource types such as database or other data store connecti
 re-initialized in the child process or need to otherwise be specially handled.  Usually the best
 place to handle re-initialization of these types of resources is in the `event.child_inited` forker callback
 option, as discussed in
-[initializing the child with the `event.child_inited` callback option](#initializing-the-child-with-the-childinit-callback-option).
+[initializing the child with the `event.child_inited` callback option](#initializing-the-child-with-the-eventchild_inited-callback-option).
 
 ## Forker Options
 
