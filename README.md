@@ -206,3 +206,33 @@ $forker->add(
 
 $exit_codes = $forker->run();
 ```
+
+### Running a callback after a child exits
+
+After each child is finished running, the `event.child_exited` callback is called.  This can be
+useful if the parent needs to do some sort of processing after each fork completes, such as for
+handling non-zero exit codes.
+
+The `event.child_exited` callback can be provided like so:
+
+```php
+$forker = new \Tines\Forker([
+    'event.child_exited' => function (array $exit_info, $fork_data) {
+        echo "Child exited\n",
+    },
+]);
+$forker->add(
+    function () {
+        echo "Lightly sleeping\n";
+    },
+    ['process_title' => 'light-sleeper']
+);
+$forker->add(
+    function () {
+        echo "Zonked out\n";
+    },
+    ['process_title' => 'heavy-sleeper']
+);
+
+$exit_codes = $forker->run();
+```
