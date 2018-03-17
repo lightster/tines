@@ -236,3 +236,12 @@ $forker->add(
 
 $exit_codes = $forker->run();
 ```
+
+The first parameter passed to the `child_exited` is an associative array containing the following
+exit information:
+
+ - `type` is a string that is one of the following values:
+    - `signal`, if the process exited due to the process being signaled
+    - `exit`, if the process exited itself
+ - `status` is the exit status code, if `type` was `'exit'`
+ - `signal` is the signal the process received, if `type` was `'signal'`
