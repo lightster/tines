@@ -245,3 +245,6 @@ exit information:
     - `exit`, if the process exited itself
  - `status` is the exit status code, if `type` was `'exit'`
  - `signal` is the signal the process received, if `type` was `'signal'`
+
+The second parameter passed to the `child_exited` callback is the fork data passed in when adding
+the fork callback via `$forker->add()`.
