@@ -248,3 +248,10 @@ exit information:
 
 The second parameter passed to the `child_exited` callback is the fork data passed in when adding
 the fork callback via `$forker->add()`.
+
+### Handing failed calls to fork
+
+In rare circumstances, it is possible for the fork system call to fail.  This happens if the process
+limit imposed by the system is reached or if the system runs out of memory/swap.  By default, Tine
+will throw an exception if this happens.  You can override this behavior by defining an
+`event.fork_failed` callback.
