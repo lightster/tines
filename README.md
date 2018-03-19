@@ -218,7 +218,7 @@ The `event.child_exited` callback can be provided like so:
 ```php
 $forker = new \Tines\Forker([
     'event.child_exited' => function (array $exit_info, $fork_data) {
-        echo "Child exited\n",
+        echo "Child exited\n";
     },
 ]);
 $forker->add(
