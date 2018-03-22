@@ -74,7 +74,7 @@ $forker->add(
         sleep(60);
     },
     [
-        'process_title' => 'light-sleeper'
+        'process_title' => 'light-sleeper',
         'timeout'       => 5,
     ],
 );
@@ -83,7 +83,7 @@ $forker->add(
         sleep(3600);
     },
     [
-        'process_title' => 'heavy-sleeper'
+        'process_title' => 'heavy-sleeper',
         'timeout'       => 10,
     ],
 );
@@ -106,7 +106,7 @@ $forker->add(
         sleep(60);
     },
     [
-        'process_title' => 'light-sleeper'
+        'process_title' => 'light-sleeper',
         'timeouts'      => [
             ['signal' => SIGHUP,  'timeout' => 10],
         ],
@@ -121,7 +121,7 @@ $forker->add(
         sleep(3600);
     },
     [
-        'process_title' => 'heavy-sleeper'
+        'process_title' => 'heavy-sleeper',
         'timeouts'      => [
             ['signal' => SIGTERM,  'timeout' => 10],
             ['signal' => SIGKILL,  'timeout' => 60],
