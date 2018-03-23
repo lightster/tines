@@ -2,8 +2,6 @@
 
 namespace Lstr\Tines;
 
-use Exception;
-
 class Forker
 {
     /**
