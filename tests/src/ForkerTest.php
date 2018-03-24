@@ -278,4 +278,16 @@ class ForkerTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals([-SIGALRM], $forker->run());
     }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testExceptionIsThrownIfForkIsAddedAfterForkerIsRan()
+    {
+        $forker = new Forker();
+
+        $forker->run();
+        $forker->add(function () {
+        });
+    }
 }
