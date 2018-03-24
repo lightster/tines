@@ -2,7 +2,6 @@
 
 namespace Lstr\Tines;
 
-use Exception;
 use PHPUnit_Framework_TestCase;
 
 class ForkerTest extends PHPUnit_Framework_TestCase
