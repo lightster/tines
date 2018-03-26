@@ -1,0 +1,4 @@
+---
+pier:
+  run:
+    command: bash bin/tines.sh
