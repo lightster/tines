@@ -1,5 +1,7 @@
 # Tines
 
+[![Build Status](https://travis-ci.org/lightster/tines.svg?branch=master)](https://travis-ci.org/lightster/tines)
+
 PHP mini-library to simplify parallel processing via forks.
 
 ## Basic Usage
