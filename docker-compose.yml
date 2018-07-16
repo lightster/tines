@@ -3,6 +3,7 @@ services:
   php:
     build:
       context: .
+      dockerfile: docker/php/Dockerfile
     volumes:
       - .:/tines
       - ~/.composer/:/root/.composer
