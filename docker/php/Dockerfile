@@ -1,4 +1,4 @@
-FROM php:5.6-cli-alpine
+FROM php:7.0-alpine
 
 # git is for composer
 # bcmath is for phpunit
