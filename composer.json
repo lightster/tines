@@ -3,7 +3,7 @@
     "description": "Library to simplify parallel processing via forks",
     "type": "library",
     "require": {
-        "php": ">=5.5.18",
+        "php": "^7",
         "ext-pcntl": "*"
     },
     "require-dev": {
